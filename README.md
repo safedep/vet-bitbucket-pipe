@@ -8,7 +8,7 @@ Add the following snippet to the script section of your `bitbucket-pipelines.yml
 
 ```yaml
 script:
-  - pipe: safedep/vet-pipe:1.0.0
+  - pipe: safedep/vet-pipe:v1.0.0
     variables:
       # POLICY: './vet/policy.yml'
       # CLOUD: true
@@ -38,14 +38,14 @@ Basic example:
 
 ```yaml
 script:
-  - pipe: safedep/vet-pipe:1.0.0
+  - pipe: safedep/vet-pipe:v1.0.0
 ```
 
 Advanced example:
 
 ```yaml
 script:
-  - pipe: safedep/vet-pipe:1.0.0
+  - pipe: safedep/vet-pipe:v1.0.0
     variables:
       POLICY: './vet/policy.yml'
       CLOUD: true
