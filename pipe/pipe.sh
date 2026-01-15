@@ -1,90 +1,169 @@
 #!/usr/bin/env bash
 
-#
-# SafeDep Vet Pipe for policy driven vetting of open source dependencies.
-#
+# ==============================================================================
+# SafeDep Vet Pipe
+# ==============================================================================
 
-echo ""
-echo "Executing SafeDep Vet Pipe..."
-echo ""
+# Global Configuration
+ARTIFACT_FILENAME="vet-report.json"
+VET_CMD_ARGS=() # Array to hold command arguments
+VET_EXIT_CODE=0
 
-# Set Default values to default variables
-# Its not possible to set them in pipe.yml
-export VET_VERSION=${VET_VERSION:-"latest"}
-export CLOUD=${CLOUD:-"false"}
-export TIMEOUT=${TIMEOUT:-300}
-export SKIP_FILTER_CI_FAIL=${SKIP_FILTER_CI_FAIL:-"false"}
+# ------------------------------------------------------------------------------
+# 1. Initialization and Defaults
+# ------------------------------------------------------------------------------
+init_defaults() {
+    echo ""
+    echo "Executing SafeDep Vet Pipe..."
+    echo ""
 
-# Pre-scan Checks
-if ! command -v vet &> /dev/null
-then
-    echo "Error: vet is not installed"
-    exit 1
-fi
+    # Set Default values using parameter expansion
+    export VET_VERSION=${VET_VERSION:-"latest"}
+    export CLOUD=${CLOUD:-"false"}
+    export TIMEOUT=${TIMEOUT:-300}
+    export SKIP_FILTER_CI_FAIL=${SKIP_FILTER_CI_FAIL:-"false"}
+}
 
-if [ -n "$POLICY" ] && [ ! -f "$POLICY" ]; then
-    echo "Policy file not found: $POLICY"
-    exit 1
-fi
+# ------------------------------------------------------------------------------
+# 2. Validation Checks
+# ------------------------------------------------------------------------------
+check_prerequisites() {
+    echo "[+] Checking prerequisites..."
 
-if [ -n "$EXCEPTION_FILE" ] && [ ! -f "$EXCEPTION_FILE" ]; then
-    echo "Exception file not found: $EXCEPTION_FILE"
-    exit 1
-fi
-
-if [ "$CLOUD" = "true" ]; then
-    if [ -z "$CLOUD_KEY" ] || [ -z "$CLOUD_TENANT" ]; then
-        echo "Cloud key and tenant must be provided when cloud is enabled"
+    if ! command -v vet &> /dev/null; then
+        echo "Error: 'vet' command is not installed or not in PATH."
         exit 1
     fi
-fi
 
-# Scan Execution
-ARTIFACT_FILENAME="vet-report.json"
-CMD="vet scan -s --report-json $ARTIFACT_FILENAME"
-
-if [ -n "$POLICY" ]; then
-    CMD="$CMD --filter-suite $POLICY"
-    if [ "$SKIP_FILTER_CI_FAIL" = "false" ]; then
-        CMD="$CMD --filter-fail --fail-fast"
+    if [ -n "$POLICY" ] && [ ! -f "$POLICY" ]; then
+        echo "Error: Policy file not found at: $POLICY"
+        exit 1
     fi
-fi
 
-if [ -n "$EXCEPTION_FILE" ]; then
-    CMD="$CMD --exceptions $EXCEPTION_FILE"
-fi
+    if [ -n "$EXCEPTION_FILE" ] && [ ! -f "$EXCEPTION_FILE" ]; then
+        echo "Error: Exception file not found at: $EXCEPTION_FILE"
+        exit 1
+    fi
+}
 
-if [ "$CLOUD" = "true" ]; then
-    CMD="$CMD --report-sync"
-    CMD="$CMD --report-sync-project $BITBUCKET_REPO_FULL_NAME"
-    CMD="$CMD --report-sync-project-version $BITBUCKET_BRANCH"
-    CMD="$CMD --malware"
-    CMD="$CMD --malware-analysis-timeout ${TIMEOUT}s"
-fi
+validate_cloud_config() {
+    if [ "$CLOUD" = "true" ]; then
+        echo "[+] Validating cloud configuration..."
+        if [ -z "$CLOUD_KEY" ] || [ -z "$CLOUD_TENANT" ]; then
+            echo "Error: CLOUD_KEY and CLOUD_TENANT must be provided when CLOUD is enabled."
+            exit 1
+        fi
 
-if [ -n "$TRUSTED_REGISTRIES" ]; then
-    IFS=',' read -ra REGISTRIES <<< "$TRUSTED_REGISTRIES"
-    for REGISTRY in "${REGISTRIES[@]}"; do
-        CMD="$CMD --trusted-registry $REGISTRY"
-    done
-fi
+        # Export Cloud specific Env Vars needed for execution
+        export VET_API_KEY=$CLOUD_KEY
+        export VET_CONTROL_TOWER_TENANT_ID=$CLOUD_TENANT
+    fi
+}
 
-# Set cloud keys and cloud tenant
-# If CLOUD = true, then we use --report-sync and use these keys
-export VET_API_KEY=$CLOUD_KEY
-export VET_CONTROL_TOWER_TENANT_ID=$CLOUD_TENANT
+# ------------------------------------------------------------------------------
+# 3. Command Construction Functions
+# ------------------------------------------------------------------------------
 
-# Run the Full command
-$CMD
+# Adds the base scan arguments
+add_base_config() {
+    VET_CMD_ARGS+=( "scan" "-s" "--report-json" "$ARTIFACT_FILENAME" )
+}
 
-# Capture the exit status of the vet command immediately
-VET_EXIT_CODE=$?
+# Adds policy enforcement arguments
+add_policy_config() {
+    if [ -n "$POLICY" ]; then
+        echo "[+] Applying Policy: $POLICY"
+        VET_CMD_ARGS+=( "--filter-suite" "$POLICY" )
 
-if [ ! -f "$ARTIFACT_FILENAME" ]; then
-    echo "Artifact file not found: $ARTIFACT_FILENAME"
-    exit 1
-fi
+        if [ "$SKIP_FILTER_CI_FAIL" = "false" ]; then
+            VET_CMD_ARGS+=( "--filter-fail" "--fail-fast" )
+        fi
+    fi
+}
 
-# Exit with the status returned by vet
-# If vet failed (non-zero), the pipe will now fail.
-exit $VET_EXIT_CODE
+# Adds exception file arguments
+add_exceptions_config() {
+    if [ -n "$EXCEPTION_FILE" ]; then
+        echo "[+] Applying Exceptions: $EXCEPTION_FILE"
+        VET_CMD_ARGS+=( "--exceptions" "$EXCEPTION_FILE" )
+    fi
+}
+
+# Adds cloud reporting and malware analysis arguments
+add_cloud_features() {
+    if [ "$CLOUD" = "true" ]; then
+        echo "[+] Enabling Cloud Sync and Malware Analysis"
+        VET_CMD_ARGS+=(
+            "--report-sync"
+            "--report-sync-project" "$BITBUCKET_REPO_FULL_NAME"
+            "--report-sync-project-version" "$BITBUCKET_BRANCH"
+            "--malware"
+            "--malware-analysis-timeout" "${TIMEOUT}s"
+        )
+    fi
+}
+
+# Adds trusted registries from CSV list
+add_registry_config() {
+    if [ -n "$TRUSTED_REGISTRIES" ]; then
+        echo "[+] Configuring Trusted Registries"
+        IFS=',' read -ra REGISTRIES <<< "$TRUSTED_REGISTRIES"
+        for REGISTRY in "${REGISTRIES[@]}"; do
+            # Trim whitespace just in case
+            REGISTRY=$(echo "$REGISTRY" | xargs)
+            VET_CMD_ARGS+=( "--trusted-registry" "$REGISTRY" )
+        done
+    fi
+}
+
+# ------------------------------------------------------------------------------
+# 4. Execution and Verification
+# ------------------------------------------------------------------------------
+execute_scan() {
+    echo "----------------------------------------------------------------"
+    echo "Running command: vet ${VET_CMD_ARGS[*]}"
+    echo "----------------------------------------------------------------"
+
+    # Run the command using the array
+    "vet" "${VET_CMD_ARGS[@]}"
+
+    # Capture exit code
+    VET_EXIT_CODE=$?
+}
+
+verify_artifact() {
+    if [ ! -f "$ARTIFACT_FILENAME" ]; then
+        echo "Error: Artifact file was not generated: $ARTIFACT_FILENAME"
+        exit 1
+    fi
+}
+
+# ------------------------------------------------------------------------------
+# Main Orchestration
+# ------------------------------------------------------------------------------
+main() {
+    init_defaults
+
+    # Validation Phase
+    check_prerequisites
+    validate_cloud_config
+
+    # Build the command arguments
+    add_base_config
+    add_policy_config
+    add_exceptions_config
+    add_cloud_features
+    add_registry_config
+
+    # Execution Phase
+    execute_scan
+
+    # Post-Execution Phase
+    verify_artifact
+
+    # Exit with the code returned by the vet tool
+    exit $VET_EXIT_CODE
+}
+
+# Invoke Main
+main

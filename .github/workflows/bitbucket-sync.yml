@@ -1,0 +1,34 @@
+name: Sync Repository to BitBucket
+
+on:
+  push:
+    branches:
+      - main
+  release:
+    types:
+      - published
+
+jobs:
+  sync-to-bitbucket:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0 # All History
+
+      - name: Sync to BitBucket on push to main
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          git remote add bitbucket https://x-token-auth:${BIT_BUCKET_ACCESS_TOKEN}@bitbucket.org/safedep/vet-pipe.git
+          git push bitbucket main
+        env:
+          BIT_BUCKET_ACCESS_TOKEN: ${{ secrets.BIT_BUCKET_ACCESS_TOKEN }}
+
+      - name: Sync tags to BitBucket
+        if: github.event_name == 'release'
+        env:
+          BIT_BUCKET_ACCESS_TOKEN: ${{ secrets.BIT_BUCKET_ACCESS_TOKEN }}
+        run: |
+          git remote add bitbucket https://x-token-auth:${BIT_BUCKET_ACCESS_TOKEN}@bitbucket.org/safedep/vet-pipe.git
+          git push bitbucket ${{ github.ref_name }}
