@@ -143,7 +143,7 @@ generate_pr_exceptions() {
         git checkout $BITBUCKET_BRANCH
 
         # 6 Add Extra Exceptions File  `--exceptions-extra` for PR
-        # `--exceptions` flat is already used for $EXCEPTION_FILE input variable
+        # `--exceptions` flag is already used for $EXCEPTION_FILE input variable
         # Hence we will use this extra exception flag for PR changes packages exception logic, both work together their files are logically concatinated.
         VET_CMD_ARGS+=( "--exceptions-extra" $VET_PR_EXCEPTION_FILE_PATH )
     else
