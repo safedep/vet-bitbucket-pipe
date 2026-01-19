@@ -133,7 +133,7 @@ generate_pr_exceptions() {
         export VET_PR_EXCEPTION_FILE_PATH="/tmp/safedep-vet/exception.yml"
 
         # 3. Create your vet json dump folder
-        mkdir $VET_JSON_DUMP_DIR
+        mkdir -p $VET_JSON_DUMP_DIR
         vet scan --json-dump-dir $VET_JSON_DUMP_DIR --enrich=false .
 
         # 4. Generate Exceptions
@@ -191,7 +191,7 @@ main() {
     add_cloud_features
     add_registry_config
 
-    # Generate Exception file for Pull Reqeust changed pacakges scanning
+    # Generate Exception file for Pull Request changed packages scanning
     generate_pr_exceptions
 
     # Execution Phase
