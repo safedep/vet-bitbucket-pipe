@@ -2,7 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
-## 1.0.0 - 2026-01-15
+## v1.1.0 - 2026-01-19
+
+### Added
+
+- Support for only changed packages scan on pull requests.
+
+## v1.0.0 - 2026-01-15
 
 ### Added
 

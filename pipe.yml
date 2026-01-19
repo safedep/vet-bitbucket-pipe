@@ -1,5 +1,5 @@
 name: SafeDep Vet Pipe
-image: ghcr.io/safedep/vet-bitbucket-pipe:v1.0.0
+image: ghcr.io/safedep/vet-bitbucket-pipe:v1.1.0
 description: SafeDep Vet Pipe for policy driven vetting of open source dependencies.
 category: Security
 repository: https://bitbucket.org/safedep/vet-pipe

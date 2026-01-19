@@ -116,6 +116,42 @@ add_registry_config() {
     fi
 }
 
+# Generate Exception file for Pull Reqeust changed pacakges scanning
+generate_pr_exceptions() {
+    # Verify this is a PR! If we have this variable set by bitbucket, its a PR
+    if [ -n "$BITBUCKET_PR_ID" ]; then
+        echo "Running vet scan in Pull Request"
+
+        # 1. Fetch the Base Branch data
+        git fetch origin $BITBUCKET_PR_DESTINATION_BRANCH
+
+        # 2. Switch to the Base Branch context
+        git checkout $BITBUCKET_PR_DESTINATION_BRANCH
+
+        # 2.5 Set reusable variables
+        export VET_JSON_DUMP_DIR="/tmp/safedep-vet/dump/"
+        export VET_PR_EXCEPTION_FILE_PATH="/tmp/safedep-vet/exception.yml"
+
+        # 3. Create your vet json dump folder
+        mkdir $VET_JSON_DUMP_DIR
+        vet scan --json-dump-dir $VET_JSON_DUMP_DIR --enrich=false .
+
+        # 4. Generate Exceptions
+        vet query --from $VET_JSON_DUMP_DIR --exceptions-filter true --exceptions-generate $VET_PR_EXCEPTION_FILE_PATH
+
+        # 5. Switch back to your Feature (Head) Branch
+        git checkout $BITBUCKET_BRANCH
+
+        # 6 Add Extra Exceptions File  `--exceptions-extra` for PR
+        # `--exceptions` flat is already used for $EXCEPTION_FILE input variable
+        # Hence we will use this extra exception flag for PR changes packages exception logic, both work together their files are logically concatinated.
+        VET_CMD_ARGS+=( "--exceptions-extra" $VET_PR_EXCEPTION_FILE_PATH )
+    else
+        echo "Running vet scan in Push."
+        # No Extra Logic is required, we do full scan
+    fi
+}
+
 # ------------------------------------------------------------------------------
 # 4. Execution and Verification
 # ------------------------------------------------------------------------------
@@ -154,6 +190,9 @@ main() {
     add_exceptions_config
     add_cloud_features
     add_registry_config
+
+    # Generate Exception file for Pull Reqeust changed pacakges scanning
+    generate_pr_exceptions
 
     # Execution Phase
     execute_scan
