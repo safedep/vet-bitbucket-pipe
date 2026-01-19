@@ -20,12 +20,14 @@ script:
 
 `vet-pipe` includes a feature to scan only the packages changed within a **Pull Request**. However, this functionality relies on environment variables — such as `BITBUCKET_PR_DESTINATION_BRANCH` — which are only populated when using Bitbucket's `pull-requests` pipeline trigger.
 
-To enable changed packges scanning for **PRs** while still supporting **Push** and **Merge** events, you must configure both the `pull-requests` and `default` (or branches) triggers. The most efficient way to implement this without code redundancy is as follows:
+To enable changed packages scanning for **PRs** while still supporting **Push** and **Merge** events, you must configure both the `pull-requests` and `default` (or branches) triggers. The most efficient way to implement this without code redundancy is as follows:
 
 ```yml
+image: alpine:latest
+
 definitions:
   steps:
-    - step: &safedep-vet-pip
+    - step: &safedep-vet-pipe
         name: "Execute Vet Scan Pipe"
         script:
           - pipe: safedep/vet-pipe:v1.1.0
@@ -33,10 +35,10 @@ definitions:
               # POLICY: './vet/policy.yml'
 pipelines:
   default:
-    - step: *safedep-vet-pip
+    - step: *safedep-vet-pipe
   pull-requests:
     '**':
-      - step: *safedep-vet-pip
+      - step: *safedep-vet-pipe
 ```
 
 ## Variables
