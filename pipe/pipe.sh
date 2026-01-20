@@ -126,7 +126,7 @@ generate_pr_exceptions() {
         git fetch origin $BITBUCKET_PR_DESTINATION_BRANCH
 
         # 2. Switch to the Base Branch context
-        git checkout $BITBUCKET_PR_DESTINATION_BRANCH
+        git checkout -f $BITBUCKET_PR_DESTINATION_BRANCH
 
         # 2.5 Set reusable variables
         export VET_JSON_DUMP_DIR="/tmp/safedep-vet/dump/"
