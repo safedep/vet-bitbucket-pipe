@@ -34,8 +34,9 @@ definitions:
             variables:
               # POLICY: './vet/policy.yml'
 pipelines:
-  default:
-    - step: *safedep-vet-pipe
+  branches:
+    main:
+      - step: *safedep-vet-pipe
   pull-requests:
     '**':
       - step: *safedep-vet-pipe
