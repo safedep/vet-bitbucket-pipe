@@ -142,7 +142,7 @@ generate_pr_exceptions() {
         vet query --no-banner --report-summary=false --silent --from $VET_JSON_DUMP_DIR --exceptions-filter true --exceptions-generate $VET_PR_EXCEPTION_FILE_PATH
 
         # 5. Switch back to your Feature (Head) Branch
-        git checkout $BITBUCKET_BRANCH
+        git checkout -f $BITBUCKET_BRANCH
 
         # 6 Add Extra Exceptions File  `--exceptions-extra` for PR
         # `--exceptions` flag is already used for $EXCEPTION_FILE input variable
