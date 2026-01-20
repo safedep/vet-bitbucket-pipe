@@ -8,7 +8,7 @@ Add the following snippet to the script section of your `bitbucket-pipelines.yml
 
 ```yaml
 script:
-  - pipe: safedep/vet-pipe:v1.1.0
+  - pipe: safedep/vet-pipe:v1.1.1
     variables:
       # POLICY: './vet/policy.yml'
       # CLOUD: true
@@ -30,12 +30,13 @@ definitions:
     - step: &safedep-vet-pipe
         name: "Execute Vet Scan Pipe"
         script:
-          - pipe: safedep/vet-pipe:v1.1.0
+          - pipe: safedep/vet-pipe:v1.1.1
             variables:
               # POLICY: './vet/policy.yml'
 pipelines:
-  default:
-    - step: *safedep-vet-pipe
+  branches:
+    main:
+      - step: *safedep-vet-pipe
   pull-requests:
     '**':
       - step: *safedep-vet-pipe
@@ -63,14 +64,14 @@ Basic example:
 
 ```yaml
 script:
-  - pipe: safedep/vet-pipe:v1.1.0
+  - pipe: safedep/vet-pipe:v1.1.1
 ```
 
 Advanced example:
 
 ```yaml
 script:
-  - pipe: safedep/vet-pipe:v1.1.0
+  - pipe: safedep/vet-pipe:v1.1.1
     variables:
       POLICY: './vet/policy.yml'
       CLOUD: true

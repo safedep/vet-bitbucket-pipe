@@ -66,7 +66,7 @@ validate_cloud_config() {
 
 # Adds the base scan arguments
 add_base_config() {
-    VET_CMD_ARGS+=( "scan" "-s" "--report-json" "$ARTIFACT_FILENAME" )
+    VET_CMD_ARGS+=( "scan" "-s" "--report-json" "$ARTIFACT_FILENAME" "--fail-fast" )
 }
 
 # Adds policy enforcement arguments
@@ -76,7 +76,7 @@ add_policy_config() {
         VET_CMD_ARGS+=( "--filter-suite" "$POLICY" )
 
         if [ "$SKIP_FILTER_CI_FAIL" = "false" ]; then
-            VET_CMD_ARGS+=( "--filter-fail" "--fail-fast" )
+            VET_CMD_ARGS+=( "--filter-fail" )
         fi
     fi
 }
@@ -122,11 +122,15 @@ generate_pr_exceptions() {
     if [ -n "$BITBUCKET_PR_ID" ]; then
         echo "Running vet scan in Pull Request"
 
+        # 0. fixes ownership issues when this pipe created file
+        # fatal: detected dubious ownership in repository at '/opt/atlassian/pipelines/agent/build'
+        git config --global --add safe.directory /opt/atlassian/pipelines/agent/build
+
         # 1. Fetch the Base Branch data
         git fetch origin $BITBUCKET_PR_DESTINATION_BRANCH
 
         # 2. Switch to the Base Branch context
-        git checkout $BITBUCKET_PR_DESTINATION_BRANCH
+        git checkout -f $BITBUCKET_PR_DESTINATION_BRANCH
 
         # 2.5 Set reusable variables
         export VET_JSON_DUMP_DIR="/tmp/safedep-vet/dump/"
@@ -134,13 +138,15 @@ generate_pr_exceptions() {
 
         # 3. Create your vet json dump folder
         mkdir -p $VET_JSON_DUMP_DIR
-        vet scan --json-dump-dir $VET_JSON_DUMP_DIR --enrich=false .
+        # Silent console reporting on intermetidery vet commands
+        vet scan --no-banner --report-summary=false --silent --json-dump-dir $VET_JSON_DUMP_DIR --enrich=false .
 
         # 4. Generate Exceptions
-        vet query --from $VET_JSON_DUMP_DIR --exceptions-filter true --exceptions-generate $VET_PR_EXCEPTION_FILE_PATH
+        # Silent console reporting on intermetidery vet commands
+        vet query --no-banner --report-summary=false --silent --from $VET_JSON_DUMP_DIR --exceptions-filter true --exceptions-generate $VET_PR_EXCEPTION_FILE_PATH
 
         # 5. Switch back to your Feature (Head) Branch
-        git checkout $BITBUCKET_BRANCH
+        git checkout -f $BITBUCKET_BRANCH
 
         # 6 Add Extra Exceptions File  `--exceptions-extra` for PR
         # `--exceptions` flag is already used for $EXCEPTION_FILE input variable

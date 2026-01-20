@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## v1.1.1 - 2026-01-20
+
+### Fixes
+
+- `--fail-fast` always, without presence of policy file (filter suite). This allows failing CI when malicious packages are found.
+
 ## v1.1.0 - 2026-01-19
 
 ### Added
