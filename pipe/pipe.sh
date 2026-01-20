@@ -134,10 +134,10 @@ generate_pr_exceptions() {
 
         # 3. Create your vet json dump folder
         mkdir -p $VET_JSON_DUMP_DIR
-        vet scan --json-dump-dir $VET_JSON_DUMP_DIR --enrich=false .
+        vet scan --no-banner --json-dump-dir $VET_JSON_DUMP_DIR --enrich=false .
 
         # 4. Generate Exceptions
-        vet query --from $VET_JSON_DUMP_DIR --exceptions-filter true --exceptions-generate $VET_PR_EXCEPTION_FILE_PATH
+        vet query --no-banner --from $VET_JSON_DUMP_DIR --exceptions-filter true --exceptions-generate $VET_PR_EXCEPTION_FILE_PATH
 
         # 5. Switch back to your Feature (Head) Branch
         git checkout $BITBUCKET_BRANCH
