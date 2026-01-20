@@ -66,7 +66,7 @@ validate_cloud_config() {
 
 # Adds the base scan arguments
 add_base_config() {
-    VET_CMD_ARGS+=( "scan" "-s" "--report-json" "$ARTIFACT_FILENAME" )
+    VET_CMD_ARGS+=( "scan" "-s" "--report-json" "$ARTIFACT_FILENAME" "--fail-fast" )
 }
 
 # Adds policy enforcement arguments
@@ -76,7 +76,7 @@ add_policy_config() {
         VET_CMD_ARGS+=( "--filter-suite" "$POLICY" )
 
         if [ "$SKIP_FILTER_CI_FAIL" = "false" ]; then
-            VET_CMD_ARGS+=( "--filter-fail" "--fail-fast" )
+            VET_CMD_ARGS+=( "--filter-fail" )
         fi
     fi
 }
