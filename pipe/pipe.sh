@@ -122,6 +122,10 @@ generate_pr_exceptions() {
     if [ -n "$BITBUCKET_PR_ID" ]; then
         echo "Running vet scan in Pull Request"
 
+        # 0. fixes ownership issues when this pipe created file
+        # fatal: detected dubious ownership in repository at '/opt/atlassian/pipelines/agent/build'
+        git config --global --add safe.directory /opt/atlassian/pipelines/agent/build
+
         # 1. Fetch the Base Branch data
         git fetch origin $BITBUCKET_PR_DESTINATION_BRANCH
 
