@@ -9,7 +9,7 @@ All notable changes to this project will be documented in this file.
 
 - `vet query` command failed due invalid `--silent` flag.
 
-- ## v1.1.1 - 2026-01-20
+## v1.1.1 - 2026-01-20
 
 ### Fixes
 
