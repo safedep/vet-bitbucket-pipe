@@ -143,7 +143,7 @@ generate_pr_exceptions() {
 
         # 4. Generate Exceptions
         # Silent console reporting on intermetidery vet commands
-        vet query --no-banner --report-summary=false --silent --from $VET_JSON_DUMP_DIR --exceptions-filter true --exceptions-generate $VET_PR_EXCEPTION_FILE_PATH
+        vet query --no-banner --report-summary=false --from $VET_JSON_DUMP_DIR --exceptions-filter true --exceptions-generate $VET_PR_EXCEPTION_FILE_PATH
 
         # 5. Switch back to your Feature (Head) Branch
         git checkout -f $BITBUCKET_BRANCH

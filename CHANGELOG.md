@@ -2,7 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
-## v1.1.1 - 2026-01-20
+
+## v1.1.2 - 2026-01-21
+
+### Fixes
+
+- `vet query` command failed due invalid `--silent` flag.
+
+- ## v1.1.1 - 2026-01-20
 
 ### Fixes
 
