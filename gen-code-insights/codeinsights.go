@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/safedep/dry/api/pb"
 	jsonreportspec "github.com/safedep/vet/gen/jsonreport"
@@ -71,21 +72,24 @@ func (ci codeInsightsGenerator) GenerateReport() (*CodeInsightsReport, error) {
 		Data:       make([]CodeInsightsData, 0),
 	}
 
-	// OPNIONATED
-	// If anything exists, vulnerability or suspicious or malicious packages
+	// OPINIONATED
+	// If anything exists, vulnerability or malicious packages
 	// then the PR is not "Safe" to Merge
 	if (vulnerabilitiesCnt +
 		violationsCnt +
 		threatsCnt +
-		suspiciousCnt +
 		maliciousCnt) > 0 {
 		report.Result = ReportResultFailed
 	}
 
-	report.Details = ""
-
 	if report.Result == ReportResultFailed {
-		report.Details = ""
+		report.Details = "Issues found, please check the report for details."
+	} else {
+		if suspiciousCnt > 0 {
+			report.Details = fmt.Sprintf("Found %d suspcious packages, human review is recommended", suspiciousCnt)
+		} else {
+			report.Details = "No issues found."
+		}
 	}
 
 	// Safe to merge data point
@@ -119,6 +123,31 @@ func (ci codeInsightsGenerator) GenerateAnnotations() (*[]CodeInsightsAnnotation
 			}
 		}
 
+		for _, m := range pkg.GetMalwareInfo() {
+			threatId := strings.TrimPrefix(m.GetThreatId(), "SD-")
+
+			switch m.GetType() {
+			case jsonreportspec.MalwareType_MALICIOUS:
+				annotations = append(annotations, CodeInsightsAnnotation{
+					Title:          "Malicious Package",
+					AnnotationType: AnnotationTypeBug,
+					Summary:        fmt.Sprintf("Package %s@%s is malicious", pkg.GetPackage().GetName(), pkg.GetPackage().GetVersion()),
+					Severity:       AnnotationSeverityCritical,
+					FilePath:       manifestPath,
+					Link:           "https://osv.dev/vulnerability/" + threatId,
+				})
+			case jsonreportspec.MalwareType_SUSPICIOUS:
+				annotations = append(annotations, CodeInsightsAnnotation{
+					Title:          "Suspicious Package",
+					AnnotationType: AnnotationTypeBug,
+					Summary:        fmt.Sprintf("Package %s@%s is suspicious", pkg.GetPackage().GetName(), pkg.GetPackage().GetVersion()),
+					Severity:       AnnotationSeverityHigh,
+					FilePath:       manifestPath,
+					Link:           "https://app.safedep.io/community/malysis/" + threatId,
+				})
+			}
+		}
+
 		for _, vuln := range pkg.GetVulnerabilities() {
 			severity := AnnotationSeverityLow
 			if len(vuln.GetSeverities()) > 0 {
@@ -145,16 +174,24 @@ func (ci codeInsightsGenerator) GenerateAnnotations() (*[]CodeInsightsAnnotation
 			})
 		}
 
-		for _, m := range pkg.GetMalwareInfo() {
-			if m.GetType() == jsonreportspec.MalwareType_MALICIOUS {
-				annotations = append(annotations, CodeInsightsAnnotation{
-					Title:          "Malicious Package",
-					AnnotationType: AnnotationTypeBug,
-					Summary:        fmt.Sprintf("Package %s@%s is malicious", pkg.GetPackage().GetName(), pkg.GetPackage().GetVersion()),
-					Severity:       AnnotationSeverityCritical,
-					FilePath:       manifestPath,
-				})
-			}
+		for _, violation := range pkg.GetViolations() {
+			annotations = append(annotations, CodeInsightsAnnotation{
+				Title:          violation.GetFilter().GetSummary(),
+				AnnotationType: AnnotationTypeCodeSmell,
+				Summary:        violation.GetFilter().GetDescription(),
+				Severity:       AnnotationSeverityMedium, // Default severity for violations
+				FilePath:       manifestPath,
+			})
+		}
+
+		for _, threat := range pkg.GetThreats() {
+			annotations = append(annotations, CodeInsightsAnnotation{
+				Title:          "Threat Detected",
+				AnnotationType: AnnotationTypeBug,
+				Summary:        fmt.Sprintf("Threat ID: %s", threat.GetId()),
+				Severity:       AnnotationSeverityHigh, // Default severity for threats
+				FilePath:       manifestPath,
+			})
 		}
 	}
 

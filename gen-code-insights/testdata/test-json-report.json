@@ -312,6 +312,12 @@
           "confidence": "MEDIUM",
           "threat_id": "SD-MAL-01JPG1XWAF8QN1YM6ECGXSAY1N"
         }
+      ],
+      "threats": [
+        {
+          "id": "test-threat-1",
+          "confidence": "MEDIUM"
+        }
       ]
     }
   ]
