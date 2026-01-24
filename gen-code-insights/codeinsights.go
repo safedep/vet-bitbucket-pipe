@@ -40,22 +40,25 @@ func NewCodeInsightsGenerator(config CodeInsightsGeneratorConfig) (codeInsightsG
 	}, nil
 }
 
+// GenerateReport is only concerned about Summary of the report
 func (ci codeInsightsGenerator) GenerateReport() (*CodeInsightsReport, error) {
-	vulnerabilities := 0
-	malicious := 0
-	suspicious := 0
+	vulnerabilitiesCnt := 0
+	violationsCnt := 0
+	threatsCnt := 0
+	maliciousCnt := 0
+	suspiciousCnt := 0
 
 	for _, pkg := range ci.reportData.GetPackages() {
-		if len(pkg.GetVulnerabilities()) > 0 {
-			vulnerabilities += len(pkg.GetVulnerabilities())
-		}
+		vulnerabilitiesCnt += len(pkg.GetVulnerabilities())
+		violationsCnt += len(pkg.GetViolations())
+		threatsCnt += len(pkg.GetThreats())
 
 		for _, m := range pkg.GetMalwareInfo() {
 			switch m.GetType() {
 			case jsonreportspec.MalwareType_SUSPICIOUS:
-				suspicious++
+				suspiciousCnt++
 			case jsonreportspec.MalwareType_MALICIOUS:
-				malicious++
+				maliciousCnt++
 			}
 		}
 	}
@@ -65,16 +68,39 @@ func (ci codeInsightsGenerator) GenerateReport() (*CodeInsightsReport, error) {
 		Reporter:   ci.config.ReportVendor,
 		ReportType: ReportTypeSecurity,
 		Result:     ReportResultPassed,
+		Data:       make([]CodeInsightsData, 0),
 	}
 
 	// OPNIONATED
 	// If anything exists, vulnerability or suspicious or malicious packages
 	// then the PR is not "Safe" to Merge
-	if (vulnerabilities + suspicious + malicious) > 0 {
+	if (vulnerabilitiesCnt +
+		violationsCnt +
+		threatsCnt +
+		suspiciousCnt +
+		maliciousCnt) > 0 {
 		report.Result = ReportResultFailed
 	}
 
-	report.Details = fmt.Sprintf("Found %d vulnerabilities, %d suspcious packages and %d malicious packages.", vulnerabilities, suspicious, malicious)
+	report.Details = ""
+
+	if report.Result == ReportResultFailed {
+		report.Details = ""
+	}
+
+	// Safe to merge data point
+	report.Data = append(report.Data, CodeInsightsData{
+		Title: "Safe to Merge",
+		Type:  DataTypeBoolean,
+		Value: report.Result,
+	})
+
+	// Key Value Data Points to show in report UI
+	report.Data = append(report.Data, createNumericCodeInsightsDataPoint("Malicious Packages", maliciousCnt))
+	report.Data = append(report.Data, createNumericCodeInsightsDataPoint("Suspicious Packages", threatsCnt))
+	report.Data = append(report.Data, createNumericCodeInsightsDataPoint("Vulnerabilities", vulnerabilitiesCnt))
+	report.Data = append(report.Data, createNumericCodeInsightsDataPoint("Threats", threatsCnt))
+	report.Data = append(report.Data, createNumericCodeInsightsDataPoint("Violations", violationsCnt))
 
 	return report, nil
 }
@@ -133,4 +159,12 @@ func (ci codeInsightsGenerator) GenerateAnnotations() (*[]CodeInsightsAnnotation
 	}
 
 	return &annotations, nil
+}
+
+func createNumericCodeInsightsDataPoint(title string, value int) CodeInsightsData {
+	return CodeInsightsData{
+		Title: title,
+		Type:  DataTypeNumber,
+		Value: value,
+	}
 }
