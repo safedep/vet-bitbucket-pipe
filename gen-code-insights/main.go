@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	// These file path are contract at `pipe/upload_report.sh`
+	// These file names are contract at `pipe/upload_report.sh`
 	codeInsightsReportJsonFilePath      = "code-insights-report.json"
 	codeInsightsAnnotationsJsonFilePath = "code-insights-annotations.json"
 )
@@ -19,8 +19,10 @@ func main() {
 	flag.Parse()
 
 	// ci == Code Insights
-	ciGenerator, err := NewCodeInsightsGeneratorWorkflow(CodeInsightsGeneratorWorkflowConfig{
+	ciGenerator, err := NewCodeInsightsGenerator(CodeInsightsGeneratorConfig{
 		SourceJsonReportFile: jsonReportFile,
+		ReportTitle:          "SafeDep Dependency Scan",
+		ReportVendor:         "safedep.io",
 	})
 
 	if err != nil {
@@ -40,12 +42,12 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err := SaveModel(*ciReport, codeInsightsReportJsonFilePath); err != nil {
+	if err := SaveModel(ciReport, codeInsightsReportJsonFilePath); err != nil {
 		fmt.Printf("failed to save code insights report data: %v\n", err)
 		os.Exit(1)
 	}
 
-	if err := SaveModel(*ciAnnotations, codeInsightsAnnotationsJsonFilePath); err != nil {
+	if err := SaveModel(ciAnnotations, codeInsightsAnnotationsJsonFilePath); err != nil {
 		fmt.Printf("failed to save code insights report data: %v\n", err)
 		os.Exit(1)
 	}
