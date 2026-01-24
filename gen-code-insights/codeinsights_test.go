@@ -76,13 +76,13 @@ func TestGenerateReport(t *testing.T) {
 						assert.Equal(t, 1, data.Value, "Malicious Packages count mismatch")
 					case "Suspicious Packages":
 						foundSuspicious = true
-						assert.Equal(t, 0, data.Value, "Suspicious Packages count mismatch")
+						assert.Equal(t, 4, data.Value, "Suspicious Packages count mismatch")
 					case "Vulnerabilities":
 						foundVulnerabilities = true
 						assert.Equal(t, 10, data.Value, "Vulnerabilities count mismatch")
 					case "Threats":
 						foundThreats = true
-						assert.Equal(t, 1, data.Value, "Threats count mismatch")
+						assert.Equal(t, 0, data.Value, "Threats count mismatch")
 					case "Violations":
 						foundViolations = true
 						assert.Equal(t, 1, data.Value, "Violations count mismatch")
@@ -136,6 +136,8 @@ func TestGenerateAnnotations(t *testing.T) {
 	violationCount := 0
 	threatCount := 0
 
+	testAnnotationsLinks := []string{}
+
 	for _, annotation := range *annotations {
 		switch annotation.AnnotationType {
 		case AnnotationTypeVulnerability:
@@ -151,6 +153,8 @@ func TestGenerateAnnotations(t *testing.T) {
 				threatCount++
 			}
 		}
+
+		testAnnotationsLinks = append(testAnnotationsLinks, annotation.Link)
 	}
 
 	assert.Equal(t, 10, vulnCount, "Expected 10 vulnerability annotations")
@@ -158,4 +162,9 @@ func TestGenerateAnnotations(t *testing.T) {
 	assert.Equal(t, 4, suspiciousCount, "Expected 4 suspicious package annotations")
 	assert.Equal(t, 1, violationCount, "Expected 1 violation annotation")
 	assert.Equal(t, 0, threatCount, "Expected 0 threat annotation")
+
+	assert.Contains(t, testAnnotationsLinks, "https://app.safedep.io/community/malysis/01KFDHJ20PFG657733QSZYBGM9")
+	assert.Contains(t, testAnnotationsLinks, "https://app.safedep.io/community/malysis/01JQ608SG8GMYG28E9SA0BPBTR")
+	assert.Contains(t, testAnnotationsLinks, "https://app.safedep.io/community/malysis/01JQ5XJ30Z5A4Z82H6TVVFH400")
+	assert.Contains(t, testAnnotationsLinks, "https://app.safedep.io/community/malysis/01JQ5Y0C8NP98F0BEZQC5RW2PP")
 }

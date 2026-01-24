@@ -101,7 +101,7 @@ func (ci codeInsightsGenerator) GenerateReport() (*CodeInsightsReport, error) {
 
 	// Key Value Data Points to show in report UI
 	report.Data = append(report.Data, createNumericCodeInsightsDataPoint("Malicious Packages", maliciousCnt))
-	report.Data = append(report.Data, createNumericCodeInsightsDataPoint("Suspicious Packages", threatsCnt))
+	report.Data = append(report.Data, createNumericCodeInsightsDataPoint("Suspicious Packages", suspiciousCnt))
 	report.Data = append(report.Data, createNumericCodeInsightsDataPoint("Vulnerabilities", vulnerabilitiesCnt))
 	report.Data = append(report.Data, createNumericCodeInsightsDataPoint("Threats", threatsCnt))
 	report.Data = append(report.Data, createNumericCodeInsightsDataPoint("Violations", violationsCnt))
@@ -124,7 +124,7 @@ func (ci codeInsightsGenerator) GenerateAnnotations() (*[]CodeInsightsAnnotation
 		}
 
 		for _, m := range pkg.GetMalwareInfo() {
-			threatId := strings.TrimPrefix(m.GetThreatId(), "SD-MAL-")
+			threatLink := "https://app.safedep.io/community/malysis/" + strings.TrimPrefix(m.GetThreatId(), "SD-MAL-")
 
 			switch m.GetType() {
 			case jsonreportspec.MalwareType_MALICIOUS:
@@ -134,7 +134,7 @@ func (ci codeInsightsGenerator) GenerateAnnotations() (*[]CodeInsightsAnnotation
 					Summary:        fmt.Sprintf("Package %s@%s is malicious", pkg.GetPackage().GetName(), pkg.GetPackage().GetVersion()),
 					Severity:       AnnotationSeverityCritical,
 					FilePath:       manifestPath,
-					Link:           "https://osv.dev/vulnerability/" + threatId,
+					Link:           threatLink,
 				})
 			case jsonreportspec.MalwareType_SUSPICIOUS:
 				annotations = append(annotations, CodeInsightsAnnotation{
@@ -143,7 +143,7 @@ func (ci codeInsightsGenerator) GenerateAnnotations() (*[]CodeInsightsAnnotation
 					Summary:        fmt.Sprintf("Package %s@%s is suspicious", pkg.GetPackage().GetName(), pkg.GetPackage().GetVersion()),
 					Severity:       AnnotationSeverityHigh,
 					FilePath:       manifestPath,
-					Link:           "https://app.safedep.io/community/malysis/" + threatId,
+					Link:           threatLink,
 				})
 			}
 		}
