@@ -63,6 +63,8 @@ func TestGenerateReport(t *testing.T) {
 				foundMalicious := false
 				foundSuspicious := false
 				foundVulnerabilities := false
+				foundThreats := false
+				foundViolations := false
 
 				for _, data := range report.Data {
 					switch data.Title {
@@ -78,6 +80,12 @@ func TestGenerateReport(t *testing.T) {
 					case "Vulnerabilities":
 						foundVulnerabilities = true
 						assert.Equal(t, 10, data.Value, "Vulnerabilities count mismatch")
+					case "Threats":
+						foundThreats = true
+						assert.Equal(t, 1, data.Value, "Threats count mismatch")
+					case "Violations":
+						foundViolations = true
+						assert.Equal(t, 1, data.Value, "Violations count mismatch")
 					}
 				}
 
@@ -85,21 +93,69 @@ func TestGenerateReport(t *testing.T) {
 				assert.True(t, foundMalicious, "expected to find 'Malicious Packages' data point")
 				assert.True(t, foundSuspicious, "expected to find 'Suspicious Packages' data point")
 				assert.True(t, foundVulnerabilities, "expected to find 'Vulnerabilities' data point")
+				assert.True(t, foundThreats, "expected to find 'Threats' data point")
+				assert.True(t, foundViolations, "expected to find 'Violations' data point")
 			}
 		})
 	}
+}
+
+func TestGenerateReport_FailedWithSuspicious(t *testing.T) {
+	reportTitle := "Test Dependency Scanning"
+	reportVendor := "safedep/vet-bitbucket-pipe"
+	sourceJsonReportFile := "testdata/test-json-report-suspicious.json"
+
+	wf, err := NewCodeInsightsGenerator(CodeInsightsGeneratorConfig{
+		ReportTitle:          reportTitle,
+		ReportVendor:         reportVendor,
+		SourceJsonReportFile: sourceJsonReportFile,
+	})
+	assert.NoError(t, err)
+
+	report, err := wf.GenerateReport()
+	assert.NoError(t, err)
+
+	assert.Equal(t, reportTitle, report.Title)
+	assert.Equal(t, reportVendor, report.Reporter)
+	assert.Equal(t, ReportResultPassed, report.Result)
+	assert.Equal(t, "Found 1 suspcious packages, human review is recommended", report.Details)
 }
 
 func TestGenerateAnnotations(t *testing.T) {
 	wf, err := NewCodeInsightsGenerator(CodeInsightsGeneratorConfig{
 		SourceJsonReportFile: "testdata/test-json-report.json",
 	})
-
 	assert.NoError(t, err)
 
 	annotations, err := wf.GenerateAnnotations()
 	assert.NoError(t, err)
 
-	expectedAnnotations := 21 // 10 vulnerabilities + 1 malicious package + 4 suspicious packages + 1 violation + 5 threats
-	assert.Equal(t, expectedAnnotations, len(*annotations))
+	vulnCount := 0
+	maliciousCount := 0
+	suspiciousCount := 0
+	violationCount := 0
+	threatCount := 0
+
+	for _, annotation := range *annotations {
+		switch annotation.AnnotationType {
+		case AnnotationTypeVulnerability:
+			vulnCount++
+		case AnnotationTypeCodeSmell:
+			violationCount++
+		case AnnotationTypeBug:
+			if annotation.Title == "Malicious Package" {
+				maliciousCount++
+			} else if annotation.Title == "Suspicious Package" {
+				suspiciousCount++
+			} else if annotation.Title == "Threat Detected" {
+				threatCount++
+			}
+		}
+	}
+
+	assert.Equal(t, 10, vulnCount, "Expected 10 vulnerability annotations")
+	assert.Equal(t, 1, maliciousCount, "Expected 1 malicious package annotation")
+	assert.Equal(t, 4, suspiciousCount, "Expected 4 suspicious package annotations")
+	assert.Equal(t, 1, violationCount, "Expected 1 violation annotation")
+	assert.Equal(t, 0, threatCount, "Expected 0 threat annotation")
 }

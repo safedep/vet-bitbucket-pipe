@@ -124,7 +124,7 @@ func (ci codeInsightsGenerator) GenerateAnnotations() (*[]CodeInsightsAnnotation
 		}
 
 		for _, m := range pkg.GetMalwareInfo() {
-			threatId := strings.TrimPrefix(m.GetThreatId(), "SD-")
+			threatId := strings.TrimPrefix(m.GetThreatId(), "SD-MAL-")
 
 			switch m.GetType() {
 			case jsonreportspec.MalwareType_MALICIOUS:
