@@ -1,7 +1,7 @@
-FROM ghcr.io/safedep/vet:v1.12.16
+FROM ghcr.io/safedep/vet:v1.12.18
 
 # download curl
-# build reporter go app and add binary ih /reporter
+# build reporter go app and add binary ih /gen-code-insights
 # as 2 stage docker build
 
 COPY pipe /

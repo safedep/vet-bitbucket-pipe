@@ -1,0 +1,318 @@
+{
+  "meta": {
+    "tool_name": "vet",
+    "tool_version": "v1.12.17-9ea413b",
+    "created_at": "2026-01-24T08:08:03Z"
+  },
+  "manifests": [
+    {
+      "id": "ad7418f51130a22a",
+      "ecosystem": "PyPI",
+      "path": "requirements.txt",
+      "display_path": "/home/kunal/dev/safedep/test-vet-pipe/requirements.txt",
+      "source_type": "local",
+      "namespace": "/home/kunal/dev/safedep/test-vet-pipe"
+    }
+  ],
+  "packages": [
+    {
+      "package": { "ecosystem": "PyPI", "name": "xser", "version": "0.1a1" },
+      "manifests": ["ad7418f51130a22a"],
+      "malware_info": [
+        {
+          "type": "SAFE",
+          "confidence": "MEDIUM",
+          "threat_id": "SD-MAL-01JQ608TF9XNJ5NY4YZJX9NKPK"
+        }
+      ]
+    },
+    {
+      "package": { "ecosystem": "PyPI", "name": "mem-llm", "version": "2.4.1" },
+      "manifests": ["ad7418f51130a22a"],
+      "malware_info": [
+        {
+          "type": "SUSPICIOUS",
+          "confidence": "MEDIUM",
+          "threat_id": "SD-MAL-01KFDHJ20PFG657733QSZYBGM9"
+        }
+      ]
+    },
+    {
+      "package": {
+        "ecosystem": "PyPI",
+        "name": "requests",
+        "version": "2.19.1"
+      },
+      "manifests": ["ad7418f51130a22a"],
+      "advices": [
+        {
+          "type": "UpgradePackage",
+          "target_alternate_package_version": "2.32.5"
+        }
+      ],
+      "vulnerabilities": [
+        {
+          "id": "GHSA-9hjg-9r4m-mvj7",
+          "title": "Requests vulnerable to .netrc credentials leak via malicious URLs",
+          "aliases": ["CVE-2024-47081"],
+          "severities": [
+            {
+              "type": "CVSSV3",
+              "score": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:H/I:N/A:N",
+              "risk": "MEDIUM"
+            }
+          ]
+        },
+        {
+          "id": "GHSA-9wx4-h78v-vm56",
+          "title": "Requests `Session` object does not verify requests after making first request with verify=False",
+          "aliases": ["CVE-2024-35195"],
+          "severities": [
+            {
+              "type": "CVSSV3",
+              "score": "CVSS:3.1/AV:L/AC:H/PR:H/UI:R/S:U/C:H/I:H/A:N",
+              "risk": "MEDIUM"
+            }
+          ]
+        },
+        {
+          "id": "GHSA-j8r2-6x86-q33q",
+          "title": "Unintended leak of Proxy-Authorization header in requests",
+          "aliases": ["CVE-2023-32681", "PYSEC-2023-74"],
+          "severities": [
+            {
+              "type": "CVSSV3",
+              "score": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:C/C:H/I:N/A:N",
+              "risk": "MEDIUM"
+            }
+          ]
+        },
+        {
+          "id": "GHSA-x84v-xcm2-53pg",
+          "title": "Insufficiently Protected Credentials in Requests",
+          "aliases": ["CVE-2018-18074", "PYSEC-2018-28"],
+          "severities": [
+            {
+              "type": "CVSSV3",
+              "score": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
+              "risk": "HIGH"
+            }
+          ]
+        },
+        {
+          "id": "PYSEC-2018-28",
+          "aliases": ["CVE-2018-18074", "GHSA-x84v-xcm2-53pg"]
+        },
+        {
+          "id": "PYSEC-2023-74",
+          "aliases": ["CVE-2023-32681", "GHSA-j8r2-6x86-q33q"]
+        }
+      ],
+      "licenses": [{ "id": "Apache-2.0" }],
+      "malware_info": [
+        {
+          "type": "SAFE",
+          "confidence": "MEDIUM",
+          "threat_id": "SD-MAL-01JNAJV3XSRYNZGNDHF1ZVBPKX"
+        }
+      ]
+    },
+    {
+      "package": {
+        "ecosystem": "PyPI",
+        "name": "lebai-sdk-asyncio",
+        "version": "0.2.24"
+      },
+      "manifests": ["ad7418f51130a22a"],
+      "projects": [
+        {
+          "name": "lebai-robotics/lebai-sdk.rs",
+          "stars": 2,
+          "url": "https://github.com/lebai-robotics/lebai-sdk.rs"
+        }
+      ],
+      "malware_info": [
+        {
+          "type": "SUSPICIOUS",
+          "confidence": "MEDIUM",
+          "threat_id": "SD-MAL-01JQ608SG8GMYG28E9SA0BPBTR"
+        }
+      ]
+    },
+    {
+      "package": {
+        "ecosystem": "PyPI",
+        "name": "fastapi",
+        "version": "0.61.2"
+      },
+      "manifests": ["ad7418f51130a22a"],
+      "advices": [
+        {
+          "type": "UpgradePackage",
+          "target_alternate_package_version": "0.128.0"
+        }
+      ],
+      "vulnerabilities": [
+        {
+          "id": "GHSA-8h2j-cgx8-6xv7",
+          "title": "Cross-Site Request Forgery (CSRF) in FastAPI",
+          "aliases": ["CVE-2021-32677", "PYSEC-2021-100"],
+          "severities": [
+            {
+              "type": "CVSSV3",
+              "score": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:H/A:N",
+              "risk": "HIGH"
+            },
+            {
+              "score": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:L/VI:H/VA:N/SC:N/SI:N/SA:N"
+            }
+          ]
+        },
+        {
+          "id": "PYSEC-2021-100",
+          "aliases": ["CVE-2021-32677", "GHSA-8h2j-cgx8-6xv7"]
+        },
+        {
+          "id": "PYSEC-2024-38",
+          "aliases": [
+            "CVE-2024-24762",
+            "GHSA-2jv5-9r88-3w3p",
+            "GHSA-qf9m-vfgh-m389"
+          ],
+          "severities": [
+            {
+              "type": "CVSSV3",
+              "score": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "risk": "HIGH"
+            }
+          ]
+        }
+      ],
+      "licenses": [{ "id": "MIT" }],
+      "projects": [
+        {
+          "name": "tiangolo/fastapi",
+          "stars": 94094,
+          "url": "https://github.com/tiangolo/fastapi"
+        }
+      ],
+      "malware_info": [
+        {
+          "type": "SAFE",
+          "confidence": "HIGH",
+          "threat_id": "SD-MAL-01JNAJV4035BVJYRB5XP7PTNZ4"
+        }
+      ]
+    },
+    {
+      "package": {
+        "ecosystem": "PyPI",
+        "name": "nonebot-plugin-resolver2",
+        "version": "1.7.7"
+      },
+      "manifests": ["ad7418f51130a22a"],
+      "malware_info": [
+        {
+          "type": "SUSPICIOUS",
+          "confidence": "MEDIUM",
+          "threat_id": "SD-MAL-01JQ5XJ30Z5A4Z82H6TVVFH400"
+        }
+      ]
+    },
+    {
+      "package": {
+        "ecosystem": "PyPI",
+        "name": "uvicorn",
+        "version": "0.11.7"
+      },
+      "manifests": ["ad7418f51130a22a"],
+      "licenses": [{ "id": "non-standard" }],
+      "projects": [
+        {
+          "name": "encode/uvicorn",
+          "stars": 10322,
+          "url": "https://github.com/encode/uvicorn"
+        }
+      ],
+      "malware_info": [
+        {
+          "type": "SAFE",
+          "confidence": "HIGH",
+          "threat_id": "SD-MAL-01JNAJV3RJ4X4H9S9ZSD3QG3J6"
+        }
+      ]
+    },
+    {
+      "package": {
+        "ecosystem": "PyPI",
+        "name": "guanghuan-pmp-kaoqian-dayi-jiangyi-zhangli-fix1",
+        "version": "2025.3.25.1"
+      },
+      "manifests": ["ad7418f51130a22a"],
+      "malware_info": [
+        {
+          "type": "SUSPICIOUS",
+          "confidence": "MEDIUM",
+          "threat_id": "SD-MAL-01JQ5Y0C8NP98F0BEZQC5RW2PP"
+        }
+      ]
+    },
+    {
+      "package": {
+        "ecosystem": "PyPI",
+        "name": "sympy-dev",
+        "version": "1.2.6"
+      },
+      "manifests": ["ad7418f51130a22a"],
+      "violations": [
+        {
+          "check_type": "CheckTypeMalware",
+          "filter": {
+            "name": "malware",
+            "check_type": "CheckTypeMalware",
+            "summary": "Malicious (malware) component detected by Malware Analyzer",
+            "description": "Malware Analyzer analyzed the package for possible malicious behavior",
+            "references": ["https://docs.safedep.io/cloud/malware-analysis"],
+            "tags": ["malware-analysis"]
+          }
+        }
+      ],
+      "advices": [
+        {
+          "type": "UpgradePackage",
+          "target_alternate_package_version": "1.2.6"
+        }
+      ],
+      "vulnerabilities": [
+        { "id": "MAL-2026-450", "title": "Malicious code in sympy-dev (PyPI)" }
+      ],
+      "licenses": [{ "id": "MIT" }],
+      "malware_info": [
+        {
+          "type": "MALICIOUS",
+          "confidence": "HIGH",
+          "threat_id": "SD-MAL-01KF6A8XK4K2H7DWE27QVQE6S2"
+        }
+      ]
+    },
+    {
+      "package": { "ecosystem": "PyPI", "name": "numpy", "version": "2.2.4" },
+      "manifests": ["ad7418f51130a22a"],
+      "licenses": [{ "id": "non-standard" }],
+      "projects": [
+        {
+          "name": "numpy/numpy",
+          "stars": 31281,
+          "url": "https://github.com/numpy/numpy"
+        }
+      ],
+      "malware_info": [
+        {
+          "type": "SAFE",
+          "confidence": "MEDIUM",
+          "threat_id": "SD-MAL-01JPG1XWAF8QN1YM6ECGXSAY1N"
+        }
+      ]
+    }
+  ]
+}

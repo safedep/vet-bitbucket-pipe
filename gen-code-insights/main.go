@@ -1,12 +1,15 @@
 package main
 
 import (
-	"bytes"
 	"flag"
+	"fmt"
 	"os"
+)
 
-	"github.com/safedep/dry/api/pb"
-	jsonreportspec "github.com/safedep/vet/gen/jsonreport"
+const (
+	// These file path are contract at `pipe/upload_report.sh`
+	codeInsightsReportJsonFilePath      = "code-insights-report.json"
+	codeInsightsAnnotationsJsonFilePath = "code-insights-annotations.json"
 )
 
 func main() {
@@ -15,15 +18,35 @@ func main() {
 	flag.StringVar(&jsonReportFile, "json-report-file", "", "Vet generated JSON report file path")
 	flag.Parse()
 
-	if jsonReportFile == "" {
-		os.Exit(1)
-	}
+	// ci == Code Insights
+	ciGenerator, err := NewCodeInsightsGeneratorWorkflow(CodeInsightsGeneratorWorkflowConfig{
+		SourceJsonReportFile: jsonReportFile,
+	})
 
-	data, err := os.ReadFile(jsonReportFile)
 	if err != nil {
+		fmt.Printf("failed to initiate bitbucket code insights generator: %v\n", err)
 		os.Exit(1)
 	}
 
-	var report jsonreportspec.Report
-	err = pb.FromJson(bytes.NewReader(data), &report)
+	ciReport, err := ciGenerator.GenerateReport()
+	if err != nil {
+		fmt.Printf("failed to generate code insights report: %v\n", err)
+		os.Exit(1)
+	}
+
+	ciAnnotations, err := ciGenerator.GenerateAnnotations()
+	if err != nil {
+		fmt.Printf("failed to generate code insights annotations: %v\n", err)
+		os.Exit(1)
+	}
+
+	if err := SaveModel(*ciReport, codeInsightsReportJsonFilePath); err != nil {
+		fmt.Printf("failed to save code insights report data: %v\n", err)
+		os.Exit(1)
+	}
+
+	if err := SaveModel(*ciAnnotations, codeInsightsAnnotationsJsonFilePath); err != nil {
+		fmt.Printf("failed to save code insights report data: %v\n", err)
+		os.Exit(1)
+	}
 }

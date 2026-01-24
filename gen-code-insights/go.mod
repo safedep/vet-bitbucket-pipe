@@ -4,7 +4,7 @@ go 1.25.5
 
 require (
 	github.com/safedep/dry v0.0.0-20260122135904-f8a75be1a0ae
-	github.com/safedep/vet v1.12.16
+	github.com/safedep/vet v1.12.18
 )
 
 require (

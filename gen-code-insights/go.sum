@@ -23,6 +23,8 @@ github.com/safedep/dry v0.0.0-20260122135904-f8a75be1a0ae h1:WZgX1OOLcgQHd0h4LsB
 github.com/safedep/dry v0.0.0-20260122135904-f8a75be1a0ae/go.mod h1:9SwpyfCBNND1GJFQJXccxCx/2sHULfitWSLtqEDkruU=
 github.com/safedep/vet v1.12.16 h1:jn/SrxAzaF8LyAxSefMQK7qBr+zncpVeNgUc1Zo+G/c=
 github.com/safedep/vet v1.12.16/go.mod h1:n90aY9eZ8vP7V0yq9jMvjkuldpy0GH/H7U/6LIfztlo=
+github.com/safedep/vet v1.12.18 h1:HMHP4NadmtANKnGrlYdo6hhFJrXwAlchtKV5TCcmFdk=
+github.com/safedep/vet v1.12.18/go.mod h1:n90aY9eZ8vP7V0yq9jMvjkuldpy0GH/H7U/6LIfztlo=
 github.com/stretchr/testify v1.11.1 h1:7s2iGBzp5EwR7/aIZr8ao5+dra3wiQyKjjFuvgVKu7U=
 github.com/stretchr/testify v1.11.1/go.mod h1:wZwfW3scLgRK+23gO65QZefKpKQRnfz6sD981Nm4B6U=
 google.golang.org/protobuf v1.36.8 h1:xHScyCOEuuwZEc6UtSOvPbAT4zRh0xcNRYekJwfqyMc=
