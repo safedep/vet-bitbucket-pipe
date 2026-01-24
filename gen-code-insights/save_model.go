@@ -7,7 +7,7 @@ import (
 )
 
 func SaveModel(model any, filePath string) error {
-	data, err := json.MarshalIndent(model, "\t", "")
+	data, err := json.MarshalIndent(model, "", "\t")
 	if err != nil {
 		return fmt.Errorf("failed to json marshal model: %w", err)
 	}

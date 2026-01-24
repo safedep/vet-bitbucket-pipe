@@ -24,31 +24,24 @@ func main() {
 		ReportTitle:          "SafeDep Dependency Scan",
 		ReportVendor:         "safedep.io",
 	})
-
-	if err != nil {
-		fmt.Printf("failed to initiate bitbucket code insights generator: %v\n", err)
-		os.Exit(1)
-	}
+	handleError("failed to initiate bitbucket code insights generator", err)
 
 	ciReport, err := ciGenerator.GenerateReport()
-	if err != nil {
-		fmt.Printf("failed to generate code insights report: %v\n", err)
-		os.Exit(1)
-	}
+	handleError("failed to generate code insights report", err)
 
 	ciAnnotations, err := ciGenerator.GenerateAnnotations()
+	handleError("failed to generate code insights annotations", err)
+
+	err = SaveModel(ciReport, codeInsightsReportJsonFilePath)
+	handleError("failed to save code insights report data", err)
+
+	err = SaveModel(ciAnnotations, codeInsightsAnnotationsJsonFilePath)
+	handleError("failed to save code insights report data", err)
+}
+
+func handleError(msg string, err error) {
 	if err != nil {
-		fmt.Printf("failed to generate code insights annotations: %v\n", err)
-		os.Exit(1)
-	}
-
-	if err := SaveModel(ciReport, codeInsightsReportJsonFilePath); err != nil {
-		fmt.Printf("failed to save code insights report data: %v\n", err)
-		os.Exit(1)
-	}
-
-	if err := SaveModel(ciAnnotations, codeInsightsAnnotationsJsonFilePath); err != nil {
-		fmt.Printf("failed to save code insights report data: %v\n", err)
+		fmt.Printf("%s: %v", msg, err)
 		os.Exit(1)
 	}
 }

@@ -47,31 +47,6 @@ curl -s --proxy $PROXY -X PUT \
   -H "Content-Type: application/json" \
   -d @code-insights-report.json
 
-# 3. Create Bulk Annotations
-# Note: We send an ARRAY [] of objects
-cat <<EOF > code-insight-annotations.json
-[
-  {
-    "external_id": "VULN-001",
-    "title": "Critical: lodash vulnerability",
-    "annotation_type": "VULNERABILITY",
-    "summary": "Prototype Pollution in lodash. Upgrade to v4.17.21.",
-    "severity": "CRITICAL",
-    "path": "requirements.txt",
-    "line": 1
-  },
-  {
-    "external_id": "VULN-002",
-    "title": "High: axios vulnerability",
-    "annotation_type": "VULNERABILITY",
-    "summary": "Server-Side Request Forgery (SSRF) in axios.",
-    "severity": "HIGH",
-    "path": "KUNAL.txt",
-    "line": 2
-  }
-]
-EOF
-
 # 4. POST the array to the annotations endpoint
 # Note: There is NO annotation ID in this URL because it is a bulk POST
 curl -s --proxy $PROXY -X POST \
