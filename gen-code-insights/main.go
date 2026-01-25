@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	// These file names are contract at `pipe/upload_report.sh`
+	// These file names are coordinated with `pipe/upload_report.sh`
 	codeInsightsReportJsonFilePath      = "code-insights-report.json"
 	codeInsightsAnnotationsJsonFilePath = "code-insights-annotations.json"
 )
@@ -41,7 +41,7 @@ func main() {
 
 func handleError(msg string, err error) {
 	if err != nil {
-		fmt.Printf("%s: %v", msg, err)
+		fmt.Fprintf(os.Stderr, "%s: %v\n", msg, err)
 		os.Exit(1)
 	}
 }

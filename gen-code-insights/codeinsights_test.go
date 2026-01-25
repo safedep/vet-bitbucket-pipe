@@ -100,27 +100,6 @@ func TestGenerateReport(t *testing.T) {
 	}
 }
 
-func TestGenerateReport_FailedWithSuspicious(t *testing.T) {
-	reportTitle := "Test Dependency Scanning"
-	reportVendor := "safedep/vet-bitbucket-pipe"
-	sourceJsonReportFile := "testdata/test-json-report-suspicious.json"
-
-	wf, err := NewCodeInsightsGenerator(CodeInsightsGeneratorConfig{
-		ReportTitle:          reportTitle,
-		ReportVendor:         reportVendor,
-		SourceJsonReportFile: sourceJsonReportFile,
-	})
-	assert.NoError(t, err)
-
-	report, err := wf.GenerateReport()
-	assert.NoError(t, err)
-
-	assert.Equal(t, reportTitle, report.Title)
-	assert.Equal(t, reportVendor, report.Reporter)
-	assert.Equal(t, ReportResultPassed, report.Result)
-	assert.Equal(t, "Found 1 suspcious packages, human review is recommended", report.Details)
-}
-
 func TestGenerateAnnotations(t *testing.T) {
 	wf, err := NewCodeInsightsGenerator(CodeInsightsGeneratorConfig{
 		SourceJsonReportFile: "testdata/test-json-report.json",

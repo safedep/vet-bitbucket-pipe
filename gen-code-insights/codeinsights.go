@@ -33,7 +33,9 @@ func NewCodeInsightsGenerator(config CodeInsightsGeneratorConfig) (codeInsightsG
 	}
 
 	report := new(jsonreportspec.Report)
-	err = pb.FromJson(bytes.NewReader(data), report)
+	if err := pb.FromJson(bytes.NewReader(data), report); err != nil {
+		return codeInsightsGenerator{}, fmt.Errorf("failed to read protobuf json spec: %w", err)
+	}
 
 	return codeInsightsGenerator{
 		config:     config,
@@ -86,7 +88,7 @@ func (ci codeInsightsGenerator) GenerateReport() (*CodeInsightsReport, error) {
 		report.Details = "Issues found, please check the report for details."
 	} else {
 		if suspiciousCnt > 0 {
-			report.Details = fmt.Sprintf("Found %d suspcious packages, human review is recommended", suspiciousCnt)
+			report.Details = fmt.Sprintf("Found %d suspicious packages, human review is recommended", suspiciousCnt)
 		} else {
 			report.Details = "No issues found."
 		}
@@ -96,7 +98,7 @@ func (ci codeInsightsGenerator) GenerateReport() (*CodeInsightsReport, error) {
 	report.Data = append(report.Data, CodeInsightsData{
 		Title: "Safe to Merge",
 		Type:  DataTypeBoolean,
-		Value: report.Result,
+		Value: report.Result == ReportResultPassed,
 	})
 
 	// Key Value Data Points to show in report UI
