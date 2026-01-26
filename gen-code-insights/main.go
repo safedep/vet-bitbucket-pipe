@@ -6,16 +6,15 @@ import (
 	"os"
 )
 
-const (
-	// These file names are coordinated with `pipe/upload_report.sh`
-	codeInsightsReportJsonFilePath      = "code-insights-report.json"
-	codeInsightsAnnotationsJsonFilePath = "code-insights-annotations.json"
-)
-
 func main() {
 	var jsonReportFile string
+	var codeInsightsReportJsonFilePath string
+	var codeInsightsAnnotationsJsonFilePath string
 
-	flag.StringVar(&jsonReportFile, "json-report-file", "", "Vet generated JSON report file path")
+	flag.StringVar(&jsonReportFile, "source-json-report-file", "", "Vet generated JSON report file path")
+	flag.StringVar(&codeInsightsReportJsonFilePath, "dest-report-file", "code-insights-report.json", "Bitbucket Code Insights report file path")
+	flag.StringVar(&codeInsightsAnnotationsJsonFilePath, "dest-annotations-file", "code-insights-annotations.json", "Bitbucket Code Insights annotations file path")
+
 	flag.Parse()
 
 	// ci == Code Insights

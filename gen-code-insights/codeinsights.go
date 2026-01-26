@@ -111,7 +111,7 @@ func (ci codeInsightsGenerator) GenerateReport() (*CodeInsightsReport, error) {
 	return report, nil
 }
 
-func (ci codeInsightsGenerator) GenerateAnnotations() (*[]CodeInsightsAnnotation, error) {
+func (ci codeInsightsGenerator) GenerateAnnotations() ([]CodeInsightsAnnotation, error) {
 	annotations := []CodeInsightsAnnotation{}
 
 	for _, pkg := range ci.reportData.GetPackages() {
@@ -197,7 +197,7 @@ func (ci codeInsightsGenerator) GenerateAnnotations() (*[]CodeInsightsAnnotation
 		}
 	}
 
-	return &annotations, nil
+	return annotations, nil
 }
 
 func createNumericCodeInsightsDataPoint(title string, value int) CodeInsightsData {

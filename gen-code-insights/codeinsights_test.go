@@ -117,7 +117,7 @@ func TestGenerateAnnotations(t *testing.T) {
 
 	testAnnotationsLinks := []string{}
 
-	for _, annotation := range *annotations {
+	for _, annotation := range annotations {
 		switch annotation.AnnotationType {
 		case AnnotationTypeVulnerability:
 			vulnCount++
