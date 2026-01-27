@@ -10,6 +10,7 @@
 #
 # Docs: https://support.atlassian.com/bitbucket-cloud/docs/code-insights/
 #
+# Default file paths:
 # code-insights-report.json contains metadata (title, desc, link, result and key-val elements etc)
 # code-insights-annotations.json contains annotations (line by line markers)
 #
@@ -31,7 +32,7 @@ fi
 echo "Generating report from: $VET_JSON_REPORT_PATH"
 
 # Call gen-code-insights CLI to generate code-insights-*.json files
-/gen-code-insights --json-report-file "$VET_JSON_REPORT_PATH"
+/gen-code-insights --source-json-report-file "$VET_JSON_REPORT_PATH" --dest-report-file "code-insights-report.json" --dest-annotations-file "code-insights-annotations.json"
 if [ $? -ne 0 ]; then
     echo "Error: Failed to generate code insights reports"
     exit 1
