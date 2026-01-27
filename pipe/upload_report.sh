@@ -56,6 +56,8 @@ if [ ! -f "$DEST_CODE_INSIGHTS_ANNOTATIONS_FILEPATH" ]; then
 fi
 
 # TODO: to enable reporting from pipe we need auth
+# Without oauth it can be uploaded but via PROXY and from users pripeline not 3rd party pipe
+# for 3rd party pipe we need email + api key
 # https://support.atlassian.com/bitbucket-cloud/kb/convert-bitbucket-pipeline-test-reports-into-pull-requests-code-insight-reports/
 
 # # Setup variables
