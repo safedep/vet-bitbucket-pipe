@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## v1.2.0 - 2026-01-21
+
+### Added
+
+- Support for creating Bitbucket Code Insights report artifact
+- These artifacts are `vet-code-insights-report.json` and `vet-code-insights-annotations.json`
 
 ## v1.1.2 - 2026-01-21
 

@@ -6,6 +6,7 @@
 
 # Global Configuration
 ARTIFACT_FILENAME="vet-report.json"
+DEFAULT_POLICY="/default-policy.yml"
 VET_CMD_ARGS=() # Array to hold command arguments
 VET_EXIT_CODE=0
 
@@ -74,10 +75,13 @@ add_policy_config() {
     if [ -n "$POLICY" ]; then
         echo "[+] Applying Policy: $POLICY"
         VET_CMD_ARGS+=( "--filter-suite" "$POLICY" )
+    else
+        echo "[+] Applying Default Policy: $DEFAULT_POLICY"
+        VET_CMD_ARGS+=( "--filter-suite" "$DEFAULT_POLICY" )
+    fi
 
-        if [ "$SKIP_FILTER_CI_FAIL" = "false" ]; then
-            VET_CMD_ARGS+=( "--filter-fail" )
-        fi
+    if [ "$SKIP_FILTER_CI_FAIL" = "false" ]; then
+        VET_CMD_ARGS+=( "--filter-fail" )
     fi
 }
 
@@ -205,6 +209,9 @@ main() {
 
     # Post-Execution Phase
     verify_artifact
+
+    # Call upload_report.sh file to create and update Bitbucket Code Insights Report
+    /upload_report.sh $ARTIFACT_FILENAME
 
     # Exit with the code returned by the vet tool
     exit $VET_EXIT_CODE
