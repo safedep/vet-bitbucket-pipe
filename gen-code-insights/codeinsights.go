@@ -166,11 +166,17 @@ func (ci codeInsightsGenerator) GenerateAnnotations() ([]CodeInsightsAnnotation,
 				}
 			}
 
+			title := vuln.GetTitle()
+			if title == "" {
+				// common in PYSEC vuls
+				title = fmt.Sprintf("Package %s is vulnerable to %s", pkg.Package.Name, vuln.GetId())
+			}
+
 			annotations = append(annotations, CodeInsightsAnnotation{
 				ExternalID:     vuln.GetId(),
-				Title:          vuln.GetTitle(),
+				Title:          title,
 				AnnotationType: AnnotationTypeVulnerability,
-				Summary:        vuln.GetTitle(),
+				Summary:        fmt.Sprintf("Package %s is vulnerable", pkg.Package.Name),
 				Severity:       severity,
 				FilePath:       manifestPath,
 			})

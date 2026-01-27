@@ -1,4 +1,4 @@
-FROM golang:1.25-bookworm@sha256:c4bc0741e3c79c0e2d47ca2505a06f5f2a44682ada94e1dba251a3854e60c2bd AS builder
+FROM golang:1.25.5 AS builder
 
 WORKDIR /app
 
@@ -14,7 +14,8 @@ RUN CGO_ENABLED=0 go build -o /gen-code-insights .
 
 FROM ghcr.io/safedep/vet:v1.12.18
 
-RUN apk --no-cache add curl
+RUN apt update -y
+RUN apt install curl -y
 
 COPY --from=builder /gen-code-insights /
 

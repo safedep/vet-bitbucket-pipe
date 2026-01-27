@@ -70,7 +70,7 @@ func TestGenerateReport(t *testing.T) {
 					switch data.Title {
 					case "Safe to Merge":
 						foundSafeToMerge = true
-						assert.Equal(t, report.Result, data.Value, "Safe to Merge value mismatch")
+						assert.Equal(t, false, data.Value, "Safe to Merge value mismatch")
 					case "Malicious Packages":
 						foundMalicious = true
 						assert.Equal(t, 1, data.Value, "Malicious Packages count mismatch")
