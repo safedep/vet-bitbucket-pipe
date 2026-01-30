@@ -5,7 +5,9 @@
 # ==============================================================================
 
 # Global Configuration
-ARTIFACT_FILENAME="vet-report.json"
+JSON_REPORT_ARTIFACT_FILENAME="vet-report.json"
+BB_META_REPORT_ARTIFACT_FILENAME="code-insights-meta-report.json"
+BB_ANNOTATIONS_REPORT_ARTIFACT_FILENAME="code-insights-annotations-report.json"
 DEFAULT_POLICY="/default-policy.yml"
 VET_CMD_ARGS=() # Array to hold command arguments
 VET_EXIT_CODE=0
@@ -67,7 +69,7 @@ validate_cloud_config() {
 
 # Adds the base scan arguments
 add_base_config() {
-    VET_CMD_ARGS+=( "scan" "-s" "--report-json" "$ARTIFACT_FILENAME" "--fail-fast" )
+    VET_CMD_ARGS+=( "scan" "-s" "--report-json" "$JSON_REPORT_ARTIFACT_FILENAME" "--report-bitbucket-meta" "$BB_META_REPORT_ARTIFACT_FILENAME" "--report-bitbucket-annotations" "$BB_ANNOTATIONS_REPORT_ARTIFACT_FILENAME" "--fail-fast" )
 }
 
 # Adds policy enforcement arguments
@@ -120,7 +122,7 @@ add_registry_config() {
     fi
 }
 
-# Generate Exception file for Pull Reqeust changed pacakges scanning
+# Generate Exception file for Pull Request changed packages scanning
 generate_pr_exceptions() {
     # Verify this is a PR! If we have this variable set by bitbucket, its a PR
     if [ -n "$BITBUCKET_PR_ID" ]; then
@@ -178,8 +180,8 @@ execute_scan() {
 }
 
 verify_artifact() {
-    if [ ! -f "$ARTIFACT_FILENAME" ]; then
-        echo "Error: Artifact file was not generated: $ARTIFACT_FILENAME"
+    if [ ! -f "$JSON_REPORT_ARTIFACT_FILENAME" ]; then
+        echo "Error: Artifact file was not generated: $JSON_REPORT_ARTIFACT_FILENAME"
         exit 1
     fi
 }
@@ -211,7 +213,7 @@ main() {
     verify_artifact
 
     # Call upload_report.sh file to create and update Bitbucket Code Insights Report
-    /upload_report.sh $ARTIFACT_FILENAME
+    /upload_report.sh "$BB_META_REPORT_ARTIFACT_FILENAME" "$BB_ANNOTATIONS_REPORT_ARTIFACT_FILENAME"
 
     # Exit with the code returned by the vet tool
     exit $VET_EXIT_CODE
