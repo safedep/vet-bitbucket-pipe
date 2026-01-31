@@ -181,7 +181,17 @@ execute_scan() {
 
 verify_artifact() {
     if [ ! -f "$JSON_REPORT_ARTIFACT_FILENAME" ]; then
-        echo "Error: Artifact file was not generated: $JSON_REPORT_ARTIFACT_FILENAME"
+        echo "Error: JSON report file was not generated: $JSON_REPORT_ARTIFACT_FILENAME"
+        exit 1
+    fi
+
+    if [ ! -f "$BB_META_REPORT_ARTIFACT_FILENAME" ]; then
+        echo "Error: Bitbucket meta report file was not generated: $BB_META_REPORT_ARTIFACT_FILENAME"
+        exit 1
+    fi
+
+    if [ ! -f "$BB_ANNOTATIONS_REPORT_ARTIFACT_FILENAME" ]; then
+        echo "Error: Bitbucket annotations report file was not generated: $BB_ANNOTATIONS_REPORT_ARTIFACT_FILENAME"
         exit 1
     fi
 }

@@ -21,13 +21,13 @@ echo ""
 BB_META_REPORT_PATH="$1"
 BB_ANNOTATIONS_REPORT_PATH="$2"
 
-if [ -z "$BB_META_REPORT_PATH" ]; then
+if [ ! -f "$BB_META_REPORT_PATH" ]; then
     echo "Error: Missing Bitbucket Meta Report path."
     echo "Usage: $0 code-insights-meta-report.json code-insights-annotations-report.json"
     exit 1
 fi
 
-if [ -z "$BB_ANNOTATIONS_REPORT_PATH" ]; then
+if [ ! -f "$BB_ANNOTATIONS_REPORT_PATH" ]; then
     echo "Error: Missing Bitbucket Annotations Report path."
     echo "Usage: $0 code-insights-meta-report.json code-insights-annotations-report.json"
     exit 1
@@ -48,17 +48,27 @@ PROXY="http://host.docker.internal:29418"
 echo "Starting report upload for commit: $COMMIT"
 
 # Create the Base Report
-curl -s --proxy "$PROXY" -X PUT \
+curl -sS --fail --proxy "$PROXY" -X PUT \
   "http://api.bitbucket.org/2.0/repositories/${REPO_PATH}/commit/${COMMIT}/reports/${REPORT_ID}" \
   -H "Content-Type: application/json" \
   -d "@$BB_META_REPORT_PATH"
 
+if [ $? -ne 0 ]; then
+    echo "Error: Failed to upload Bitbucket Code Insights base report for commit: $COMMIT"
+    exit 1
+fi
+
 # POST the array to the annotations endpoint
 # Note: There is NO annotation ID in this URL because it is a bulk POST
-curl -s --proxy "$PROXY" -X POST \
+curl -sS --fail --proxy "$PROXY" -X POST \
   "http://api.bitbucket.org/2.0/repositories/${REPO_PATH}/commit/${COMMIT}/reports/${REPORT_ID}/annotations" \
   -H "Content-Type: application/json" \
   -d "@$BB_ANNOTATIONS_REPORT_PATH"
+
+if [ $? -ne 0 ]; then
+    echo "Error: Failed to upload Bitbucket Code Insights annotations for report: $REPORT_ID"
+    exit 1
+fi
 
 echo ""
 
