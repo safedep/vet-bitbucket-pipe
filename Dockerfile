@@ -1,4 +1,7 @@
-FROM ghcr.io/safedep/vet:v1.12.16
+FROM ghcr.io/safedep/vet:v1.12.22
+
+RUN apt update -y
+RUN apt install curl -y
 
 COPY pipe /
 COPY LICENSE.txt pipe.yml README.md /
