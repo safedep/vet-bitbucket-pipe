@@ -35,35 +35,31 @@ fi
 
 echo "Publishing BitBucket Code Insights Reports"
 
-
 # Setup variables
 REPO_PATH="${BITBUCKET_WORKSPACE}/${BITBUCKET_REPO_SLUG}"
 COMMIT="${BITBUCKET_COMMIT}"
 REPORT_ID="safedep-vet-scan"
 
-# Bitbucket API Proxy for Auth-less API access
-HOST_GATEWAY="172.17.0.1"
-PROXY_PORT="29418"
-INTERNAL_PROXY="http://${HOST_GATEWAY}:${PROXY_PORT}"
-
-export HTTP_PROXY="$INTERNAL_PROXY"
-export HTTPS_PROXY="$INTERNAL_PROXY"
-# Optional: Ensure we don't try to proxy internal traffic
-export NO_PROXY="localhost,127.0.0.1"
+# Bitbucket Supports proxy at localhost:29418 for accessing its API
+# without authentication, since we are in 3rd party container, we have use
+# docker host network to access it
+PROXY="http://host.docker.internal:29418"
 
 echo "Starting report upload for commit: $COMMIT"
 
 # Create the Base Report
-curl -X PUT \
-  "https://api.bitbucket.org/2.0/repositories/${REPO_PATH}/commit/${COMMIT}/reports/${REPORT_ID}" \
+curl -s --proxy "$PROXY" -X PUT \
+  "http://api.bitbucket.org/2.0/repositories/${REPO_PATH}/commit/${COMMIT}/reports/${REPORT_ID}" \
   -H "Content-Type: application/json" \
   -d "@$BB_META_REPORT_PATH"
 
 # POST the array to the annotations endpoint
 # Note: There is NO annotation ID in this URL because it is a bulk POST
-curl -X POST \
-  "https://api.bitbucket.org/2.0/repositories/${REPO_PATH}/commit/${COMMIT}/reports/${REPORT_ID}/annotations" \
+curl -s --proxy "$PROXY" -X POST \
+  "http://api.bitbucket.org/2.0/repositories/${REPO_PATH}/commit/${COMMIT}/reports/${REPORT_ID}/annotations" \
   -H "Content-Type: application/json" \
   -d "@$BB_ANNOTATIONS_REPORT_PATH"
+
+echo ""
 
 echo "Bulk annotations successfully posted to report: $REPORT_ID"

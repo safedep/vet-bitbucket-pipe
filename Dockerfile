@@ -1,4 +1,4 @@
-FROM ghcr.io/safedep/vet:v1.12.19
+FROM ghcr.io/safedep/vet:v1.12.22
 
 RUN apt update -y
 RUN apt install curl -y
