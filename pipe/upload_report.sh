@@ -23,13 +23,13 @@ BB_ANNOTATIONS_REPORT_PATH="$2"
 
 if [ -z "$BB_META_REPORT_PATH" ]; then
     echo "Error: Missing Bitbucket Meta Report path."
-    echo "Usage: $0 path/to/code-insights-meta-report.json"
+    echo "Usage: $0 code-insights-meta-report.json code-insights-annotations-report.json"
     exit 1
 fi
 
 if [ -z "$BB_ANNOTATIONS_REPORT_PATH" ]; then
     echo "Error: Missing Bitbucket Annotations Report path."
-    echo "Usage: $0 path/to/code-insights-annotations-report.json"
+    echo "Usage: $0 code-insights-meta-report.json code-insights-annotations-report.json"
     exit 1
 fi
 
