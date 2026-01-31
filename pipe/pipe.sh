@@ -225,6 +225,11 @@ main() {
     # Call upload_report.sh file to create and update Bitbucket Code Insights Report
     /upload_report.sh "$BB_META_REPORT_ARTIFACT_FILENAME" "$BB_ANNOTATIONS_REPORT_ARTIFACT_FILENAME"
 
+    if [ $? -ne 0 ]; then
+        echo "Error: Failed to upload Code Insights reports"
+        exit 1
+    fi
+
     # Exit with the code returned by the vet tool
     exit $VET_EXIT_CODE
 }
