@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## v1.3.0 - 2026-02-10
+
+### Changed
+
+- Updated vet version to 1.13.1
+
 ## v1.2.0 - 2026-01-31
 
 ### Added
